@@ -1,0 +1,55 @@
+AI RESEARCH DAILY — {{ date }}
+{% if mode == "revisit" %}
+{% if revisit %}
+RESEARCH WORTH REVISITING
+{{ revisit.title }}
+{{ revisit.authors }} | {{ revisit.published_at[:10] if revisit.published_at }}
+{{ revisit.url }}
+
+What it introduced: {{ revisit.retro.get("introduced", "") }}
+How it works: {{ revisit.retro.get("how_it_works", "") }}
+Why it was important: {{ revisit.retro.get("why_important", "") }}
+Still relevant? {{ revisit.retro.get("still_relevant", "") }}
+What came after: {{ revisit.retro.get("what_came_after", "") }}
+Learn today: {{ revisit.retro.get("learn_today", "") }}
+{% else %}
+No qualifying research today. Nothing to report.
+{% endif %}
+{% else %}
+TODAY'S AI IN 30 SECONDS
+{% for b in thirty_seconds %}- {{ b }}
+{% endfor %}
+
+=== TODAY'S MOST IMPORTANT AI DEVELOPMENT ===
+{% macro block(it) %}
+{{ it.title }}  [score {{ '%.1f'|format(it.overall_score) }} | {{ it.category }} | {{ it.claim_type }}]
+{% if it.one_line %}{{ it.one_line }}
+{% endif %}
+Problem: {{ it.problem }}
+Method: {{ it.method }}
+Results: {{ it.results }}
+Why it matters: {{ it.why_it_matters }}
+Future potential: {{ it.future_potential }}
+{% if it.project_idea %}Project idea: {{ it.project_idea }}
+{% endif %}
+Links: {{ it.url }}{% if it.code_url %} | code: {{ it.code_url }}{% endif %}{% if it.project_url %} | project: {{ it.project_url }}{% endif %}
+{% endmacro %}
+{{ block(hero) }}
+{% if computer_vision %}
+=== AI VISION / COMPUTER VISION ===
+{% for it in computer_vision %}{{ block(it) }}
+{% endfor %}{% endif %}
+{% if other %}
+=== OTHER IMPORTANT AI RESEARCH ===
+{% for it in other %}{{ block(it) }}
+{% endfor %}{% endif %}
+{% if recommendation and recommendation.reason %}
+=== TODAY'S RECOMMENDATION ===
+If you read only one thing today, read this:
+{{ recommendation.title }} — {{ recommendation.url }}
+{{ recommendation.reason }}
+{% endif %}
+{% endif %}
+{% if dashboard_url %}
+Dashboard: {{ dashboard_url }}
+{% endif %}

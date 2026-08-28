@@ -1,0 +1,9 @@
+requests>=2.31
+feedparser>=6.0.11
+rapidfuzz>=3.6
+PyYAML>=6.0
+Jinja2>=3.1
+beautifulsoup4>=4.12
+lxml>=5.1
+python-dateutil>=2.9
+libsql>=0.1.0

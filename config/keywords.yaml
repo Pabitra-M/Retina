@@ -1,0 +1,104 @@
+# Keyword vocabularies + weights for the no-LLM pre-ranking stage (pipeline/score.py).
+# Matching is case-insensitive substring against title + abstract.
+
+priority1_computer_vision:
+  weight: 5.0
+  terms:
+    - object detection
+    - object tracking
+    - multi-object tracking
+    - multiple object tracking
+    - "mot"
+    - video analytics
+    - vision transformer
+    - "vit"
+    - vision-language model
+    - vision language model
+    - "vlm"
+    - "yolo"
+    - real-time detection
+    - real time detection
+    - semantic segmentation
+    - instance segmentation
+    - panoptic segmentation
+    - segmentation
+    - pose estimation
+    - keypoint
+    - anomaly detection
+    - surveillance
+    - re-identification
+    - "re-id"
+    - person re-identification
+    - retail analytics
+    - store analytics
+    - crowd counting
+    - edge ai
+    - edge deployment
+    - "jetson"
+    - "raspberry pi"
+    - on-device
+    - quantization
+    - quantisation
+    - model compression
+    - pruning
+    - knowledge distillation
+    - inference acceleration
+    - real-time inference
+    - depth estimation
+    - optical flow
+    - 3d detection
+    - monocular
+    - "nerf"
+    - gaussian splatting
+    - image classification
+    - open-vocabulary
+    - open vocabulary
+    - zero-shot detection
+    - dataset
+    - benchmark
+
+priority2_general_ai:
+  weight: 3.0
+  terms:
+    - multimodal
+    - large language model
+    - "llm"
+    - small language model
+    - "slm"
+    - ai agent
+    - agentic
+    - tool use
+    - reasoning model
+    - chain-of-thought
+    - retrieval-augmented
+    - "rag"
+    - robot
+    - robotics
+    - manipulation
+    - embodied
+    - diffusion model
+    - generative
+    - text-to-image
+    - text-to-video
+    - mixture of experts
+    - "moe"
+    - state space model
+    - "mamba"
+    - open-source model
+    - open weights
+    - fine-tuning
+    - "lora"
+    - inference engine
+    - kv cache
+    - flash attention
+    - context length
+    - long context
+
+# Per-source trust weight added to the heuristic score.
+source_authority:
+  arxiv: 3.0
+  huggingface_daily: 3.5
+  paperswithcode: 3.0
+  github: 2.0
+  hackernews: 1.5
+  rss: 2.5

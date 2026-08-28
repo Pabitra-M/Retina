@@ -1,0 +1,64 @@
+# Source registry. Toggle any source with enabled: false.
+
+arxiv:
+  enabled: true
+  categories: [cs.CV, cs.AI, cs.LG, cs.CL, cs.RO, cs.MM, eess.IV]
+
+huggingface_daily:
+  # Needs a free HF token now (set HF_TOKEN in .env / Actions secret). Best-effort otherwise.
+  enabled: true
+  url: https://huggingface.co/api/daily_papers
+
+paperswithcode:
+  enabled: true
+  # best-effort: API is frequently rate-limited / down. Failure is logged, not fatal.
+  trending_url: https://paperswithcode.com/api/v1/papers/
+
+github:
+  enabled: true
+  # new or fast-rising repos created in the last N days, by topic
+  created_within_days: 21
+  topics:
+    - computer-vision
+    - object-detection
+    - object-tracking
+    - image-segmentation
+    - pose-estimation
+    - vision-language-model
+    - multimodal
+    - large-language-models
+    - llm
+    - ai-agents
+    - diffusion-models
+
+hackernews:
+  enabled: true
+  # Algolia search API; one query per line
+  queries:
+    - computer vision
+    - object detection
+    - vision transformer
+    - vision language model
+    - LLM
+    - AI agents
+    - open source model
+    - diffusion model
+    - robotics
+
+rss:
+  enabled: true
+  feeds:
+    - name: Google Research Blog
+      url: https://research.google/blog/rss/
+    - name: DeepMind Blog
+      url: https://deepmind.google/blog/rss.xml
+    - name: OpenAI Blog
+      url: https://openai.com/news/rss.xml
+    - name: BAIR Blog
+      url: https://bair.berkeley.edu/blog/feed.xml
+    - name: The Gradient
+      url: https://thegradient.pub/rss/
+    - name: Hugging Face Blog
+      url: https://huggingface.co/blog/feed.xml
+    - name: MIT Technology Review AI
+      url: https://www.technologyreview.com/topic/artificial-intelligence/feed/

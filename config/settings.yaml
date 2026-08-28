@@ -1,0 +1,48 @@
+# Tuning knobs for the daily agent. Everything here is safe to edit.
+
+summarizer: gemini          # gemini | ollama | extractive  (only gemini implemented today)
+
+gemini:
+  # gemini-3.6-flash free tier is only 20 requests/DAY. flash-lite has a much larger
+  # free daily quota — use it. (gemini-3.6-flash if you ever add billing.)
+  model: gemini-3.5-flash-lite
+  embed_model: gemini-embedding-001
+  # Semantic dedupe pass. Fuzzy title matching already catches most cross-source dups;
+  # enable this only if you see duplicates slipping through. Capped at semantic_dedupe_max items.
+  use_embeddings_for_dedupe: false
+  semantic_dedupe_max: 40
+  max_output_tokens: 4096
+  temperature: 0.3
+  requests_per_minute: 10    # flash-lite free tier allows ~15 rpm; stay just under
+  max_retries: 6
+
+collect:
+  arxiv_max_results: 150
+  github_min_stars: 40
+  hn_min_points: 60
+  per_source_timeout_sec: 15
+
+shortlist:
+  # how many heuristic-ranked candidates get sent to the LLM for full scoring.
+  size: 15
+
+select:
+  min_overall_score: 6.5    # items below this are archived but not emailed/featured
+  min_items_for_normal_mode: 3
+  max_hero: 1
+  max_computer_vision: 6
+  max_other: 4
+
+freshness:
+  # widening windows (hours) tried in order until enough items clear the bar
+  windows_hours: [24, 168, 720]
+
+revisit:
+  # candidate pool for "Research Worth Revisiting" when the day is weak
+  arxiv_query: "cat:cs.CV AND (abs:detection OR abs:segmentation OR abs:tracking OR abs:transformer)"
+  min_age_days: 180
+
+dedupe:
+  fuzzy_title_threshold: 92     # rapidfuzz token_set_ratio
+  embedding_cosine_threshold: 0.90
+  compare_against_last_days: 45

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Research Intelligence</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --panel:#ffffff; --text:#15161c; --muted:#6b7280; --border:#e5e7eb;
+    --accent:#2563eb; --chip:#eef2ff; --chip-text:#3730a3; --shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0e0f13;--panel:#181a20;--text:#e8e9ec;--muted:#9aa0ab;--border:#2a2d36;
+      --accent:#6ea8fe;--chip:#22252e;--chip-text:#b9c4e8;--shadow:0 1px 3px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  header{padding:22px 18px 10px;max-width:960px;margin:0 auto}
+  h1{font-size:20px;margin:0}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 18px 60px}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+  .tab{border:1px solid var(--border);background:var(--panel);color:var(--text);
+    padding:6px 12px;border-radius:999px;font-size:13px;cursor:pointer}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  #search{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;
+    background:var(--panel);color:var(--text);font-size:14px;margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .card h3{margin:0 0 4px;font-size:15px}
+  .card h3 a{color:var(--text);text-decoration:none}
+  .meta{color:var(--muted);font-size:12px;margin-bottom:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{background:var(--chip);color:var(--chip-text);border-radius:6px;padding:1px 7px;font-size:11px}
+  .score{font-weight:700}
+  .summary{font-size:13.5px;margin:6px 0}
+  .links a{color:var(--accent);text-decoration:none;font-size:12.5px;margin-right:12px}
+  .bk{float:right;border:none;background:none;cursor:pointer;font-size:16px;color:var(--muted)}
+  .bk.on{color:#f59e0b}
+  .detail{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .detail h2{margin-top:0;font-size:19px}
+  .detail section{margin:14px 0}
+  .detail section h4{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .back{display:inline-block;margin-bottom:14px;color:var(--accent);cursor:pointer;font-size:13px}
+  .empty{color:var(--muted);text-align:center;padding:40px 0}
+  code{background:var(--chip);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>AI Research Intelligence</h1>
+  <div class="sub" id="sub">Loading…</div>
+</header>
+<div class="wrap">
+  <div id="listview">
+    <div class="tabs" id="tabs"></div>
+    <input id="search" placeholder="Search: object tracking, YOLO, retail computer vision, vision language model, edge AI…">
+    <div id="list"></div>
+  </div>
+  <div id="detailview" style="display:none"></div>
+</div>
+
+<script>
+const TABS = ["Today","This Week","Computer Vision","LLM","Agents","Multimodal","Robotics","Saved"];
+const CAT = {"Computer Vision":"computer-vision","LLM":"llm","Agents":"agents","Multimodal":"multimodal","Robotics":"robotics"};
+let DATA = [], activeTab = "Today";
+
+const saved = {
+  key:"aird_saved",
+  get(){ try{return JSON.parse(localStorage.getItem(this.key))||[]}catch(e){return []} },
+  has(id){ return this.get().includes(id) },
+  toggle(id){ let s=this.get(); s=s.includes(id)?s.filter(x=>x!==id):[...s,id];
+    try{localStorage.setItem(this.key,JSON.stringify(s))}catch(e){} render(); }
+};
+
+function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d; }
+function within(item, n){
+  const raw = item.featured_date || item.date_discovered || item.published_at;
+  if(!raw) return false;
+  return new Date(raw) >= daysAgo(n);
+}
+function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function filterItems(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  let items = DATA.slice();
+  if(activeTab==="Today") items = items.filter(i=>within(i,1) || i.featured_date===DATA_TODAY);
+  else if(activeTab==="This Week") items = items.filter(i=>within(i,7));
+  else if(activeTab==="Saved") items = items.filter(i=>saved.has(i.id));
+  else if(CAT[activeTab]) items = items.filter(i=>i.category===CAT[activeTab]);
+  if(q){
+    items = items.filter(i=>{
+      const hay = [i.title,i.one_line,i.method,i.problem,i.why_it_matters,i.authors,
+        (i.keywords||[]).join(" ")].join(" ").toLowerCase();
+      return q.split(/\s+/).every(t=>hay.includes(t));
+    });
+  }
+  items.sort((a,b)=>(b.overall_score||0)-(a.overall_score||0));
+  return items;
+}
+
+function cardHTML(i){
+  const links = [["Paper",i.url],["Code",i.code_url],["Project",i.project_url],["Dataset",i.dataset_url]]
+    .filter(([_,u])=>u).map(([l,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${l} ↗</a>`).join("");
+  const on = saved.has(i.id) ? "on" : "";
+  return `<div class="card">
+    <button class="bk ${on}" data-id="${i.id}" title="Save">${on?"★":"☆"}</button>
+    <h3><a href="#/item/${i.id}">${esc(i.title)}</a></h3>
+    <div class="meta">
+      ${i.category?`<span class="chip">${esc(i.category)}</span>`:""}
+      ${i.claim_type?`<span class="chip">${esc(i.claim_type)}</span>`:""}
+      <span class="score">${(i.overall_score||0).toFixed(1)}</span>
+      <span>${(i.published_at||i.date_discovered||"").slice(0,10)}</span>
+    </div>
+    <div class="summary">${esc(i.one_line||i.why_it_matters||"")}</div>
+    <div class="links">${links}</div>
+  </div>`;
+}
+
+function render(){
+  const isDetail = location.hash.startsWith("#/item/");
+  document.getElementById("listview").style.display = isDetail ? "none":"block";
+  document.getElementById("detailview").style.display = isDetail ? "block":"none";
+  if(isDetail){ renderDetail(location.hash.slice(7)); return; }
+
+  document.getElementById("tabs").innerHTML = TABS.map(t=>
+    `<button class="tab ${t===activeTab?"active":""}" data-tab="${t}">${t}</button>`).join("");
+  const items = filterItems();
+  document.getElementById("list").innerHTML = items.length
+    ? items.map(cardHTML).join("")
+    : `<div class="empty">Nothing here yet. The agent adds items once a day.</div>`;
+}
+
+function renderDetail(id){
+  const i = DATA.find(x=>x.id===id);
+  const v = document.getElementById("detailview");
+  if(!i){ v.innerHTML = `<span class="back" onclick="history.back()">← back</span><p>Not found.</p>`; return; }
+  const secs = [["Overview","one_line"],["Problem","problem"],["Method","method"],
+    ["Architecture","architecture"],["Results","results"],["Why It Matters","why_it_matters"],
+    ["Limitations","limitations"],["Future Potential","future_potential"],["Project Idea","project_idea"]];
+  const links = [["Paper",i.url],["PDF",i.pdf_url],["Code",i.code_url],["Project",i.project_url],["Dataset",i.dataset_url]]
+    .filter(([_,u])=>u).map(([l,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${l} ↗</a>`).join(" · ");
+  v.innerHTML = `<a class="back" href="#/">← back to list</a>
+    <div class="detail">
+      <h2>${esc(i.title)}</h2>
+      <div class="meta">${esc(i.authors||"")} · ${(i.published_at||"").slice(0,10)}
+        · <span class="chip">${esc(i.category||"")}</span>
+        · <span class="chip">${esc(i.claim_type||"")}</span>
+        · score <span class="score">${(i.overall_score||0).toFixed(1)}</span></div>
+      ${secs.filter(([_,k])=>i[k]).map(([l,k])=>
+        `<section><h4>${l}</h4><div>${esc(i[k])}</div></section>`).join("")}
+      <section><h4>Resources</h4><div class="links">${links||"—"}</div></section>
+    </div>`;
+}
+
+document.addEventListener("click",e=>{
+  const tab = e.target.closest(".tab");
+  if(tab){ activeTab = tab.dataset.tab; render(); }
+  const bk = e.target.closest(".bk");
+  if(bk){ saved.toggle(bk.dataset.id); }
+});
+document.getElementById("search").addEventListener("input", render);
+window.addEventListener("hashchange", render);
+
+let DATA_TODAY = new Date().toISOString().slice(0,10);
+fetch("data.json").then(r=>r.json()).then(d=>{
+  DATA = d.items || [];
+  document.getElementById("sub").textContent =
+    `${d.count} papers & projects archived · updated ${(d.generated_at||"").slice(0,10)}`;
+  render();
+}).catch(e=>{
+  document.getElementById("sub").textContent = "Could not load data.json";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.log
+data/last_run.json
+data/*.db
+data/*.db-*
+data/turso-replica.db*
+data/last_email.html
+data/dryrun.log

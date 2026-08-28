@@ -1,0 +1,60 @@
+name: Daily AI Research Digest
+
+on:
+  schedule:
+    - cron: "0 6 * * *"      # 06:00 UTC daily — adjust to taste
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "run mode"
+        type: choice
+        options: [normal, dry-run, revisit]
+        default: normal
+
+concurrency:
+  group: daily-digest
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run the agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          case "${{ github.event.inputs.mode }}" in
+            dry-run) python run_daily.py --dry-run ;;
+            revisit) python run_daily.py --revisit ;;
+            *)       python run_daily.py ;;
+          esac
+
+      - name: Commit dashboard
+        run: |
+          git config user.name  "ai-research-daily[bot]"
+          git config user.email "actions@github.com"
+          # Archive lives in Turso; only the exported dashboard is committed.
+          # (If you use local-SQLite instead, add: git add data/archive.db)
+          git add docs/
+          git diff --staged --quiet || git commit -m "digest: $(date -u +%Y-%m-%d)"
+          git push
