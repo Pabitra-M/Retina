@@ -49,15 +49,18 @@ pytest                             # unit tests
 
 ### 3. Put it on GitHub
 
-1. Create a repo and push this folder.
-2. **Settings → Secrets and variables → Actions → New repository secret** — add:
-   `GEMINI_API_KEY`, `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD`, `EMAIL_TO`.
-   (`GITHUB_TOKEN` is provided automatically.)
-3. Add a **variable** (not secret) `DASHBOARD_URL` =
-   `https://<user>.github.io/<repo>/` for the email footer link.
-4. **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `/docs`**.
-5. **Actions** tab → *Daily AI Research Digest* → **Run workflow** (choose `dry-run` first).
-6. Once it looks good, the `cron` runs it every day at 06:00 UTC (change in
+Repo: <https://github.com/Pabitra-M/Retina>
+
+1. **Settings → Secrets and variables → Actions → Secrets → New repository secret** — add all six:
+   `GEMINI_API_KEY`, `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD`, `EMAIL_TO`,
+   `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`.
+   (`GITHUB_TOKEN` is provided automatically. `HF_TOKEN` is optional.)
+2. **Variables** tab → **New repository variable** → `DASHBOARD_URL` =
+   `https://pabitra-m.github.io/Retina/`
+3. **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `/docs`**.
+4. **Actions** tab → enable workflows → *Daily AI Research Digest* → **Run workflow**
+   (pick `dry-run` the first time).
+5. Once it looks good, the `cron` runs it every day at 06:00 UTC (change in
    `.github/workflows/daily.yml`).
 
 ---
